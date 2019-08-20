@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilter implements SecurityParams{
 
     private AuthenticationManager authenticationManager;
 
@@ -55,8 +55,8 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .withIssuer(request.getRequestURI())
                 .withSubject(user.getUsername())
                 .withArrayClaim("roles", roles.toArray(new String[roles.size()]))
-                .withExpiresAt(new Date(System.currentTimeMillis() + 10 * 24 * 3600))
-                .sign(Algorithm.HMAC256("t3sts3cr3t"));
-        response.addHeader("Authorization", jwt_token);
+                .withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION))
+                .sign(Algorithm.HMAC256(SECRET));
+        response.addHeader(JWT_HEADER_NAME , HEADER_PREFIX +jwt_token);
     }
 }

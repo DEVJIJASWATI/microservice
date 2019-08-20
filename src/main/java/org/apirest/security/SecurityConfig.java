@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -36,13 +37,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         //Auth StateLess , utilise session
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/login/**").permitAll();
+                .antMatchers("/login/**" , "/register/**").permitAll();
+        /*http.authorizeRequests()
+                .antMatchers("/userEntities/**" , "/roleEntities/**")
+                .hasAuthority("ADMIN");*/
         http.authorizeRequests()
                 .antMatchers("/userEntities/**" , "/roleEntities/**")
-                .hasAuthority("ADMIN");
+                .permitAll();
         http.authorizeRequests()
                 .anyRequest()
                 .authenticated();
         http.addFilter(new JWTAuthenticationFilter(authenticationManager()));
+        http.addFilterBefore(new JWTAutorizationFilter() , UsernamePasswordAuthenticationFilter.class);
     }
 }
